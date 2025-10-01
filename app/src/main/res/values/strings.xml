@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Supabase001</string>
+    <string name="titulo">LISTADO DE CAJEROS</string>
+    <string name="nombre">Nombre</string>
+    <string name="apellido">Apellido</string>
+    <string name="caja">Caja</string>
+    <string name="imagen">Imágen</string>
+</resources>

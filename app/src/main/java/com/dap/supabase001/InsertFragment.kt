@@ -5,17 +5,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import com.dap.supabase001.ConexionService.ConexionServiceCajero
 import com.dap.supabase001.databinding.FragmentInsertBinding
+import com.dap.supabase001.model.CajeroViewModel
 import com.dap.supabase001.model.ModelCajero
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.getValue
 
 
-/**
- * A simple [Fragment] subclass.
- * Use the [InsertFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class InsertFragment : Fragment() {
-
+    private val model: CajeroViewModel by activityViewModels()
     lateinit var binding: FragmentInsertBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,11 +33,15 @@ class InsertFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        evento()
 
     }
 
     fun evento(){
         binding.btGuardar.setOnClickListener {
+            lifecycleScope.launch {
+                insert(capturaDatos())
+            }
 
         }
     }
@@ -46,6 +54,15 @@ class InsertFragment : Fragment() {
             null,
             binding.etImagen.text.toString()
         )
+    }
+
+    suspend fun insert(datos: ModelCajero){
+        withContext(Dispatchers.IO){
+            ConexionServiceCajero.insertaSupabase(datos)
+            withContext(Dispatchers.Main){
+                model.addCajero(datos)
+            }
+        }
     }
 
 }

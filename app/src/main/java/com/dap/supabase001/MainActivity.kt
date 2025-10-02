@@ -6,6 +6,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,6 +45,16 @@ class MainActivity : AppCompatActivity() {
         observer()
         lifecycleScope.launch {
             visualiza()
+        }
+        evento()
+    }
+
+    fun evento(){
+        binding.btInsertar.setOnClickListener {
+            supportFragmentManager.commit {
+                add<InsertFragment>(R.id.main)
+                addToBackStack(null)
+            }
         }
     }
 

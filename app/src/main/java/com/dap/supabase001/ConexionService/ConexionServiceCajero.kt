@@ -20,5 +20,15 @@ class ConexionServiceCajero {
                 select().
                 decodeList<ModelCajero>()
         }
+
+        suspend fun insertaSupabase(){
+            //val city = City(name = "The Shire", countryId = 554)
+            val result =
+                supabase.
+                from("cajero").
+                insert(city) {
+                select()
+            }.decodeSingle<City>()
+        }
     }
 }

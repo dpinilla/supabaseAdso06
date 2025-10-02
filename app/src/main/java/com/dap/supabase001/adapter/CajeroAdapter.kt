@@ -8,7 +8,7 @@ import com.dap.supabase001.R
 import com.dap.supabase001.databinding.ActivityItemMainBinding
 import com.dap.supabase001.model.ModelCajero
 
-class CajeroAdapter (private val dataSet: MutableList<ModelCajero>) :
+class CajeroAdapter (var dataSet: MutableList<ModelCajero>) :
     RecyclerView.Adapter<CajeroAdapter.ViewHolderCajero>() {
     class ViewHolderCajero (view: View) : RecyclerView.ViewHolder(view) {
         val binding = ActivityItemMainBinding.bind(view)

@@ -2,13 +2,17 @@ package com.dap.supabase001
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dap.supabase001.ConexionService.ConexionServiceCajero
 import com.dap.supabase001.adapter.CajeroAdapter
 import com.dap.supabase001.databinding.ActivityMainBinding
+import com.dap.supabase001.model.CajeroViewModel
 import com.dap.supabase001.model.ModelCajero
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -17,14 +21,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-val supabase = createSupabaseClient(
-    supabaseUrl = "https://nxbylqbkjmykgquvqziu.supabase.co",
-    supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54YnlscWJram15a2dxdXZxeml1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTEwNzIsImV4cCI6MjA3MzcyNzA3Mn0.vEhYxuUjE1e-ACDd5vpYCMIIc-ijq_pMgL_0VTmWO10"
-) {
-    install(Postgrest)
-}
+
 
 class MainActivity : AppCompatActivity() {
+    private val model: CajeroViewModel by viewModels()
     lateinit var binding: ActivityMainBinding
     val dataset = mutableListOf<ModelCajero>()
     lateinit var cajeroAdapter: CajeroAdapter
@@ -39,30 +39,34 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        recyclerView()
+        observer()
+        lifecycleScope.launch {
+            visualiza()
+        }
+    }
 
+    fun recyclerView(){
         cajeroAdapter = CajeroAdapter(dataset)
 
         //val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         binding.rvCajero.layoutManager = LinearLayoutManager(this)
         binding.rvCajero.adapter = cajeroAdapter
-        lifecycleScope.launch {
-            visualiza()
-        }
-
-
+    }
+    fun observer(){
+        // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
+        model.currentName.observe(this, Observer { newName ->
+            // Update the UI, in this case, a TextView.
+            cajeroAdapter.dataSet = newName
+            cajeroAdapter.notifyDataSetChanged()
+        })
     }
 
     private suspend fun visualiza() {
         withContext(Dispatchers.IO) {
-            val datos =
-                supabase.
-                from("cajero").
-                select().
-                decodeList<ModelCajero>()
+            val datos = ConexionServiceCajero.visualizaSupabase()
             withContext(Dispatchers.Main){
-                dataset.clear()
-                dataset.addAll(datos)
-                cajeroAdapter.notifyDataSetChanged()
+               model.addAllCajero(datos)
             }
         }
     }
